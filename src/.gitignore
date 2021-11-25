@@ -1,0 +1,3 @@
+*.ipynb_checkpoints
+*ap_output
+__pycache__
