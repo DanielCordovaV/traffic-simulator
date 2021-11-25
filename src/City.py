@@ -1,6 +1,11 @@
 import enum
 
 
+class Orientation(enum.Enum):
+    HORIZONTAL = 'h'
+    VERTICAL = 'v'
+
+
 class Direction(enum.Enum):
     LEFT = 0
     RIGHT = 1
