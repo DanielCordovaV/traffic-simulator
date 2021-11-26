@@ -5,20 +5,20 @@ using UnityEngine.Networking;
 
 public class Requesting : MonoBehaviour
 {
-    // [SerializeField] private float requestDelay = 3000.0f;
+    [SerializeField] private float requestDelay = 500.0f;
 
     public ConcurrentQueue<Data> positionsQueue = new ConcurrentQueue<Data>();
     void Start()
     {
         
-        // StartCoroutine(GetText( (i) => { positionsQueue.Enqueue(i); } ));
+        StartCoroutine(GetText( (i) => { positionsQueue.Enqueue(i); } ));
     }
 
     IEnumerator GetText(System.Action<Data> callback)
     {
         while (true)
         {
-            // yield return new WaitForSeconds(requestDelay);
+            yield return new WaitForSeconds(requestDelay);
             
             UnityWebRequest www = UnityWebRequest.Get("https://traffic-simulator.us-south.cf.appdomain.cloud/");
             yield return www.SendWebRequest();

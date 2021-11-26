@@ -24,24 +24,13 @@ public class GameManager : MonoBehaviour
                 cars.Add(newGO);
             }
         }
-        
-        for (int i = 0; i < 1; i++)
-        {
-            GameObject newGO = Instantiate(carPrefab, new Vector3(0, 0, 0), Quaternion.identity);
-            cars.Add(newGO);
-        }
-
-        for (int i = 0; i < cars.Count; i++)
-        {
-            // cars[i].GetComponent<CarController>().Move(Vector3.forward);
-        }
     }
 
     void Update()
     {
         if (!requestingScript.positionsQueue.IsEmpty)
         {
-            // requestingScript.positionsQueue.TryDequeue(out positions);
+            requestingScript.positionsQueue.TryDequeue(out positions);
             for (int i = 0; i < cars.Count; i++)
             {
                 cars[i].GetComponent<CarController>().Move(Vector3.forward);
