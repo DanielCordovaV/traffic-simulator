@@ -1,7 +1,7 @@
 import enum
 import agentpy as ap
 import CarAgent
-from City import Orientation
+from City import Orientation, Direction
 
 
 class LightColor(enum.Enum):
@@ -14,14 +14,18 @@ class TrafficLightAgent(ap.Agent):
     MAX_TIMER = 10  # Max steps per green light
     there_is_main = False
 
-    def setup(self, orientation: Orientation) -> None:
+    def setup(self, direction: tuple[int, int]) -> None:
         self.condition = 2
         self.__current_light = LightColor.YELLOW
         self.__timer = 0
         self.is_main = False
         self.got_main = False
         main_traffic_light: TrafficLightAgent
-        self.orientation = orientation
+        self.direction = direction
+        if direction == Direction.DOWN or direction == Direction.Up:
+            self.orientation = Orientation.VERTICAL
+        else:
+            self.orientation = Orientation.HORIZONTAL
 
     def get_current_light(self) -> LightColor:
         return self.__current_light
