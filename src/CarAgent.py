@@ -5,6 +5,8 @@ import RoadAgent
 
 
 class CarAgent(ap.Agent):
+    def setup(self):
+        self.condition = 1
 
     def move(self) -> None:
         directions = []

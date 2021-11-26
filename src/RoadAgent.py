@@ -6,6 +6,7 @@ from City import Direction
 class RoadAgent(ap.Agent):
 
     def setup(self) -> None:
+        self.condition = 0
         self.directions: list[Direction] = []
 
     def add_directions(self, directions: list[Direction]) -> None:

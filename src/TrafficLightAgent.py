@@ -10,11 +10,12 @@ class LightColor(enum.Enum):
     RED = 'red_light'
 
 
-class TrafficLightAgent(ap.agent):
+class TrafficLightAgent(ap.Agent):
     MAX_TIMER = 10  # Max steps per green light
     there_is_main = False
 
     def setup(self, orientation: Orientation) -> None:
+        self.condition = 2
         self.__current_light = LightColor.YELLOW
         self.__timer = 0
         self.is_main = False
