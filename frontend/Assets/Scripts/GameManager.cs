@@ -1,33 +1,51 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField] private GameObject RequestManager;
-    [SerializeField] private GameObject CarPrefab;
+    [SerializeField] private GameObject requestManager;
+    [SerializeField] private GameObject carPrefab;
     
-    private Requesting RequestingScript;
+    private Requesting requestingScript;
     private Data positions;
+
+    private List<GameObject> cars = new List<GameObject>();
 
     void Start()
     {
-        RequestingScript = RequestManager.GetComponent<Requesting>();
-        RequestingScript.positionsQueue.TryDequeue(out positions);
-
-        for (int i = 0; i < positions.data.Length; i++)
+        requestingScript = requestManager.GetComponent<Requesting>();
+        if (!requestingScript.positionsQueue.IsEmpty)
         {
-            Instantiate(CarPrefab, new Vector3(0, 0, i + 10), Quaternion.identity);
+            requestingScript.positionsQueue.TryDequeue(out positions);   
+            
+            for (int i = 0; i < requestingScript.positionsQueue.Count; i++)
+            {
+                GameObject newGO = Instantiate(carPrefab, new Vector3(0, 0, 0), Quaternion.identity);
+                cars.Add(newGO);
+            }
+        }
+        
+        for (int i = 0; i < 1; i++)
+        {
+            GameObject newGO = Instantiate(carPrefab, new Vector3(0, 0, 0), Quaternion.identity);
+            cars.Add(newGO);
+        }
+
+        for (int i = 0; i < cars.Count; i++)
+        {
+            // cars[i].GetComponent<CarController>().Move(Vector3.forward);
         }
     }
 
     void Update()
     {
-        if (!RequestingScript.positionsQueue.IsEmpty)
+        if (!requestingScript.positionsQueue.IsEmpty)
         {
-            RequestingScript.positionsQueue.TryDequeue(out positions);   
+            // requestingScript.positionsQueue.TryDequeue(out positions);
+            for (int i = 0; i < cars.Count; i++)
+            {
+                cars[i].GetComponent<CarController>().Move(Vector3.forward);
+            }
         }
     }
 }

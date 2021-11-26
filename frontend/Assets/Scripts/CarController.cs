@@ -1,7 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 using UnityEngine.AI;
+using Debug = UnityEngine.Debug;
 
 public class CarController : MonoBehaviour
 {
@@ -17,6 +17,11 @@ public class CarController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // agent.destination = objective.position;
+        // agent.Move();
+    }
+
+    public void Move(Vector3 position)
+    {
+        agent.Move(position);
     }
 }
