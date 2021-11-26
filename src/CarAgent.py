@@ -25,9 +25,11 @@ class CarAgent(ap.Agent):
         new_pos = tuple(
             map(sum, zip(pos, direction)))
 
+        gridWidth = self.model.size[0]
+        gridHeight = self.model.size[1]
+
         agent: ap.Agent
-        for agent in self.model.grid.agents[new_pos[0], new_pos[1]]:
-            print(agent)
+        for agent in self.model.grid.agents[new_pos[0] % gridWidth, new_pos[1] % gridHeight]:
             if agent.type == "CarAgent":
                 return True
 
