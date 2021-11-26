@@ -26,25 +26,26 @@ class City:
         self.height = height
         self.width = width
         self.amount_of_roads = 0
-        self.grid: list[list] = [[None] * height] * width
+        self.grid: list[list] = [[None for _ in range(height)] for _ in range(width)]
 
     def add_street(self, start: tuple[int, int], end: tuple[int, int], direction: Direction) -> None:
         start_x, start_y = start
         end_x, end_y = end
         if direction == Direction.UP or direction == Direction.DOWN:  # Vertical street
             for i in range(start_y, end_y):
-                if type(self.grid[start_x][i]) is None:
+                siu = self.grid[start_x][i]
+                if self.grid[start_x][i] is None:
                     self.grid[start_x][i] = Road(direction)
                     self.amount_of_roads += 1
-                elif type(self.grid[start_x][i]) is Road:  # There is already a Road crossing that square
+                elif type(self.grid[start_x][i]) is Road:
                     self.grid[start_x][i].add_direction(direction)
 
         else:  # Horizontal street
             for i in range(start_x, end_x):
-                if type(self.grid[i][start_y]) is None:
-                    self.grid[i][start_y] = Road(direction)
+                if self.grid[i][start_y] is None:
+                    self.grid[i][start_x] = Road(direction)
                     self.amount_of_roads += 1
-                elif type(self.grid[i][start_y]) is Road:
+                elif type(self.grid[i][start_y]) is Road:  # There is already a Road crossing that square
                     self.grid[i][start_y].add_direction(direction)
 
     def __str__(self):
