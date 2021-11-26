@@ -1,6 +1,5 @@
 import enum
 import agentpy as ap
-import CarAgent
 from City import Orientation, Direction
 
 
@@ -11,31 +10,33 @@ class LightColor(enum.Enum):
 
 
 class TrafficLightAgent(ap.Agent):
-    MAX_TIMER = 10  # Max steps per green light
+    MAX_TIMER = 20  # Max steps per green light
     there_is_main = False
 
     def setup(self, direction: tuple[int, int]) -> None:
         self.__current_light = LightColor.YELLOW
         self.__timer = 0
         self.is_main = False
-        self.got_main = False
+        self.__got_main = False
         main_traffic_light: TrafficLightAgent
-        self.direction = direction
-        if direction == Direction.DOWN.value or direction == Direction.UP.value:
+        self.__set_orientation()
+
+    def __set_orientation(self):
+        if self.direction == Direction.DOWN.value or self.direction == Direction.UP.value:
             self.orientation = Orientation.VERTICAL
         else:
             self.orientation = Orientation.HORIZONTAL
 
+    def __reset_timer(self):
+        self.__timer = 0
+
     def get_current_light(self) -> LightColor:
         return self.__current_light
-
-    def reset_timer(self):
-        self.__timer = 0
 
     def set_as_main_light(self, agent: ap.Agent) -> None:
         self.__current_light = LightColor.GREEN
         self.main_traffic_light = agent
-        self.got_main = True
+        self.__got_main = True
 
     def make_main(self) -> None:
         TrafficLightAgent.there_is_main = True
@@ -59,7 +60,7 @@ class TrafficLightAgent(ap.Agent):
                 else:
                     self.get_main()
 
-    def operate_as_main(self):
+    def __operate_as_main(self):
         if self.__timer < TrafficLightAgent.MAX_TIMER:
             self.__timer += 1
         else:
@@ -67,9 +68,9 @@ class TrafficLightAgent(ap.Agent):
                 self.__current_light = LightColor.RED
             else:
                 self.__current_light = LightColor.GREEN
-            self.reset_timer()
+            self.__reset_timer()
 
-    def operate_as_slave(self):
+    def __operate_as_slave(self):
         if self.orientation == self.main_traffic_light.orientation:
             self.__current_light = self.main_traffic_light.get_current_light()
         else:
@@ -80,11 +81,11 @@ class TrafficLightAgent(ap.Agent):
 
     def check_status(self):
         if TrafficLightAgent.there_is_main:
-            if self.got_main:
+            if self.__got_main:
                 if self.is_main:
-                    self.operate_as_main()
+                    self.__operate_as_main()
                 else:
-                    self.operate_as_slave()
+                    self.__operate_as_slave()
             else:
                 self.get_main()
         else:

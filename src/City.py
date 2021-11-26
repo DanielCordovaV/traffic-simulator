@@ -50,10 +50,3 @@ class City:
 
     def __str__(self):
         return str(self.grid)
-
-
-if __name__ == "__main__":
-    size = (10, 10)
-    city = City(size[0], size[1])
-    city.add_street((4, 0), (4, 10), Direction.RIGHT)
-    city.add_street((0, 4), (10, 4), Direction.UP)
