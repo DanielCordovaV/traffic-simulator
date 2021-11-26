@@ -1,8 +1,6 @@
 import agentpy as ap
 import random
 
-import RoadAgent
-
 
 class CarAgent(ap.Agent):
     def setup(self):
@@ -12,19 +10,25 @@ class CarAgent(ap.Agent):
         directions = []
 
         neighbour: ap.Agent
-        for neighbour in self.city.neighbors(self, distance=0):
-            if neighbour.type is RoadAgent:
+        for neighbour in self.model.grid.neighbors(self, distance=0):
+            if neighbour.type == "RoadAgent":
                 directions = neighbour.directions
 
         if len(directions) > 0:
             direction = random.choice(directions).value
             if not self.check_if_car_in_front(direction):
-                self.model.city.move_by(self, direction)
+                self.model.grid.move_by(self, direction)
 
-    def check_if_car_in_front(self, direction: tuple[int]) -> bool:
-        new_pos = tuple(map(sum, zip(self.model.positions[self], direction)))
+    def check_if_car_in_front(self, direction: tuple[int, int]) -> bool:
+        pos: tuple[int, int] = self.model.grid.positions[self]
+
+        new_pos = tuple(
+            map(sum, zip(pos, direction)))
+
         agent: ap.Agent
-        for agent in self.model.city.agents[new_pos[0], new_pos[1]]:
-            if agent.type is CarAgent:
+        for agent in self.model.grid.agents[new_pos[0], new_pos[1]]:
+            print(agent)
+            if agent.type == "CarAgent":
                 return True
+
         return False
