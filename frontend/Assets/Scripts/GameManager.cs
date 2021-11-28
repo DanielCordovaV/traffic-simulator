@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -47,20 +46,21 @@ public class GameManager : MonoBehaviour
                 print("For " + i);
                 float x = objects.data[i].pos[0] * scaleMultiplier;
                 float z = objects.data[i].pos[1] * scaleMultiplier;
+                print("x = " + x + " z = " + z);
                 
                 switch (objects.data[i].type)
                 {
                     case "car":
                         print("type == car");
-                        newGO = Instantiate(carPrefab, new Vector3(x, 0, z), Quaternion.identity);
+                        newGO = Instantiate(carPrefab, new Vector3(x, 0.66f, z), Quaternion.identity);
                         newGO.transform.parent = GameObject.Find("Cars").transform;
-                        if (x == 0 && z == 4)
-                        {
-                            newGO.transform.Rotate(new Vector3 (0, -90, 0));
-                        }
-                        else if (x == 4 && z == 0)
+                        if (x == 0 * scaleMultiplier && z == 4  * scaleMultiplier)
                         {
                             newGO.transform.Rotate(new Vector3 (0, 180, 0));
+                        }
+                        else if (x == 4 * scaleMultiplier && z == 0 * scaleMultiplier)
+                        {
+                            newGO.transform.Rotate(new Vector3 (0, -90, 0));
                         }
                         cars.Add(newGO);
                         break;
@@ -79,8 +79,8 @@ public class GameManager : MonoBehaviour
                 }
             }
             
-            mesh = streets[0].GetComponent<NavMeshSurface>();
-            mesh.BuildNavMesh();
+            /*mesh = streets[0].GetComponent<NavMeshSurface>();
+            mesh.BuildNavMesh();*/
             initialized = true;
         }
     }
