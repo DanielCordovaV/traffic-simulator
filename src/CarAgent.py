@@ -9,7 +9,7 @@ class CarAgent(ap.Agent):
         agent: ap.Agent
         for agent in self.model.grid.agents[new_pos]:
             if agent.type == 'TrafficLightAgent':
-                if agent.get_current_light() == LightColor.RED:
+                if direction == agent.direction.value and agent.get_current_light() == LightColor.RED:
                     return False
         return True
 

@@ -13,16 +13,17 @@ class TrafficLightAgent(ap.Agent):
     MAX_TIMER = 20  # Max steps per green light
     there_is_main = False
 
-    def setup(self, direction: tuple[int, int]) -> None:
+    def setup(self, direction: Direction) -> None:
         self.__current_light = LightColor.YELLOW
         self.__timer = 0
         self.is_main = False
         self.__got_main = False
         main_traffic_light: TrafficLightAgent
+        self.direction = direction
         self.__set_orientation()
 
     def __set_orientation(self):
-        if self.direction == Direction.DOWN.value or self.direction == Direction.UP.value:
+        if self.direction == Direction.DOWN or self.direction == Direction.UP:
             self.orientation = Orientation.VERTICAL
         else:
             self.orientation = Orientation.HORIZONTAL
@@ -34,7 +35,6 @@ class TrafficLightAgent(ap.Agent):
         return self.__current_light
 
     def set_as_main_light(self, agent: ap.Agent) -> None:
-        self.__current_light = LightColor.GREEN
         self.main_traffic_light = agent
         self.__got_main = True
 
@@ -42,15 +42,16 @@ class TrafficLightAgent(ap.Agent):
         TrafficLightAgent.there_is_main = True
         self.is_main = True
         self.set_as_main_light(self)
+        self.__current_light = LightColor.GREEN
 
     def get_main(self) -> None:
         agent: ap.Agent
         for agent in self.model.grid.agents:
-            if agent.type is TrafficLightAgent and agent.is_main:
+            if agent.type == 'TrafficLightAgent' and agent.is_main:
                 self.set_as_main_light(agent)
                 break
 
-    def check_for_incoming_cars(self) -> None:
+    def __check_for_incoming_cars(self) -> None:
         neighbours: ap.AgentIter = self.model.grid.neighbors(self, distance=6)
         neighbour: ap.Agent
         for neighbour in neighbours:
@@ -89,4 +90,4 @@ class TrafficLightAgent(ap.Agent):
             else:
                 self.get_main()
         else:
-            self.check_for_incoming_cars()
+            self.__check_for_incoming_cars()
