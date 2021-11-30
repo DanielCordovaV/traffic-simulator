@@ -7,15 +7,15 @@ public class Requesting : MonoBehaviour
 {
     [SerializeField] private float requestDelay = 500.0f;
 
-    public ConcurrentQueue<Root> objectQueue = new ConcurrentQueue<Root>();
+    public ConcurrentQueue<Data> objectQueue = new ConcurrentQueue<Data>();
     public TextAsset jsonFile;
     public void Initialize()
     {
-        StartCoroutine(GetPositions( (i) => { objectQueue.Enqueue(i); } ));
+        // StartCoroutine(GetPositions( (i) => { objectQueue.Enqueue(i); } ));
         
-        /*Root positions = JsonUtility.FromJson<Root>("{\"data\":" + jsonFile.text + "}");
-        print(jsonFile.text);
-        print(positions.data.Count);*/
+        Data positions = JsonUtility.FromJson<Data>(jsonFile.text);
+        print(positions.cars);
+        objectQueue.Enqueue(positions);
     }
 
     IEnumerator GetPositions(System.Action<Root> callback)
@@ -26,7 +26,7 @@ public class Requesting : MonoBehaviour
             UnityWebRequest www = UnityWebRequest.Get("https://traffic-simulator.us-south.cf.appdomain.cloud/");
             yield return www.SendWebRequest();
 
-            Root positions = JsonUtility.FromJson<Root>("{\"data\":" + www.downloadHandler.text + "}");
+            Root positions = JsonUtility.FromJson<Root>(www.downloadHandler.text);
             callback(positions);
             yield return new WaitForSeconds(requestDelay);
         }
