@@ -126,6 +126,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   wheels: {fileID: 7261903312695648786}
+  spinSpeed: 5
 --- !u!1 &4836123768345848162
 GameObject:
   m_ObjectHideFlags: 0
@@ -353,7 +354,7 @@ NavMeshAgent:
   m_AutoBraking: 1
   m_AutoRepath: 1
   m_Height: 0.6
-  m_BaseOffset: 0.68
+  m_BaseOffset: 0.62
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
 --- !u!1 &7261903312695648786

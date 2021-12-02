@@ -34,5 +34,6 @@ public class Street
 {
     public int id;
     public List<int> pos;
+    public List<int> direction;
     public GameObject street;
 }

@@ -7,14 +7,18 @@ public class Requesting : MonoBehaviour
 {
     [SerializeField] private float requestDelay = 500.0f;
 
-    public ConcurrentQueue<Data> objectQueue = new ConcurrentQueue<Data>();
+    // public ConcurrentQueue<Data> objectQueue = new ConcurrentQueue<Data>();
     public TextAsset jsonFile;
+    // private Connection socket;
     public void Initialize()
     {
         // StartCoroutine(GetPositions( (i) => { objectQueue.Enqueue(i); } ));
         
+        // socket.Start();
+        
+        /*
         Data positions = JsonUtility.FromJson<Data>(jsonFile.text);
-        objectQueue.Enqueue(positions);
+        objectQueue.Enqueue(positions);*/
     }
 
     IEnumerator GetPositions(System.Action<Root> callback)

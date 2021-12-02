@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -17,6 +16,7 @@ public class GameManager : MonoBehaviour
     private Car tmpCar;
     private TrafficLight tmpTrafficLight;
     private Street tmpStreet;
+    private Connection socket;
 
     private List<Car> cars = new List<Car>();
     private List<Street> streets = new List<Street>();
@@ -28,8 +28,9 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         Debug.Log("Game Manager Start");
-        requestingScript = requestManager.GetComponent<Requesting>();
-        requestingScript.Initialize();
+        /*requestingScript = requestManager.GetComponent<Requesting>();
+        requestingScript.Initialize();*/
+        socket.Start();
     }
 
     void Update()
@@ -38,12 +39,10 @@ public class GameManager : MonoBehaviour
         {
             Initialize();
         }
-        else if (initialized)
+        else if (Singleton.Instance.objectQueue.TryDequeue(out objects))
         {
-            if (requestingScript.objectQueue.TryDequeue(out objects))
+            for (int i = 0; i < objects.cars.Count; i++) 
             {
-                for (int i = 0; i < objects.cars.Count; i++)
-                {
                     float x = objects.cars[i].pos[0] * scaleMultiplier;
                     float z = objects.cars[i].pos[1] * scaleMultiplier;
                     if (objects.cars[i].id == cars[i].id)
@@ -54,26 +53,26 @@ public class GameManager : MonoBehaviour
                     }
                     
                     Debug.Log("Moved car");
-                }
-
-                for (int i = 0; i < objects.trafficLights.Count; i++)
+            }
+    
+            for (int i = 0; i < objects.trafficLights.Count; i++)
+            {
+                if (objects.trafficLights[i].id == trafficLights[i].id)
                 {
-                    if (objects.trafficLights[i].id == trafficLights[i].id)
-                    {
-                        shader = trafficLights[i].light.GetComponentInChildren<AccessShaderProperties>();
-                        shader.ChangeLight(objects.trafficLights[i].color);
-                        trafficLights[i].color = objects.trafficLights[i].color;
-                    }
-                    
-                    Debug.Log("Changed Traffic Light Color");
+                    shader = trafficLights[i].light.GetComponentInChildren<AccessShaderProperties>();
+                    shader.ChangeLight(objects.trafficLights[i].color);
+                    trafficLights[i].color = objects.trafficLights[i].color;
                 }
+                
+                Debug.Log("Changed Traffic Light Color");
             }
         }
     }
 
+    // Places the cars, traffic lights and streets in their positions 
     void Initialize()
     {
-        if (requestingScript.objectQueue.TryDequeue(out objects))
+        if (Singleton.Instance.objectQueue.TryDequeue(out objects))
         {
             GameObject newGO;
             for (int i = 0; i < objects.cars.Count; i++)
