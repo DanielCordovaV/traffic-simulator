@@ -1,9 +1,13 @@
 import agentpy as ap
+import time
+
 from RoadAgent import RoadAgent
 from TrafficLightAgent import TrafficLightAgent
 from CarAgent import CarAgent
 from City import City, Road
 from random import choice
+
+start = 0
 
 
 class CityModel(ap.Model):
@@ -17,6 +21,8 @@ class CityModel(ap.Model):
         return positions
 
     def setup(self):
+        global start
+
         # Unpack parameters
         self.city: City = self.p["city"]
         self.n_cars: int = self.p["cars"]
@@ -31,7 +37,10 @@ class CityModel(ap.Model):
         self.__add_traffic_lights()
         self.__add_cars()
 
+        start = time.time()
+
     def step(self):
+        flag = False
         cars_to_delete = ap.AgentList(self, cls=CarAgent)
         for agent in self.grid.agents:
             if agent.type == "CarAgent":
@@ -39,17 +48,25 @@ class CityModel(ap.Model):
                 if agent.check_if_can_move(direction):
                     if agent.check_for_traffic_light(direction):
                         agent.move(direction)
+                    flag = True
                 else:
                     cars_to_delete.append(agent)
             elif agent.type == "TrafficLightAgent":
                 agent.check_status()
+
         self.grid.remove_agents(cars_to_delete)
+
+        if not flag:
+            self.end()
+            self.stop()
 
     def update(self):
         pass
 
     def end(self):
-        pass
+        global start
+        end = time.time()
+        print(end - start)
 
     def __add_roads(self) -> None:
         roads = ap.AgentList(self, self.city.amount_of_roads, RoadAgent)
@@ -69,8 +86,10 @@ class CityModel(ap.Model):
             traffic_lights = ap.AgentList(self, cls=TrafficLightAgent)
             for direction in road.directions:
                 traffic_lights.append(TrafficLightAgent(self, direction))
-            self.grid.add_agents(traffic_lights, [tuple(self.grid.positions[road])] * len(road.directions))
+            self.grid.add_agents(traffic_lights, [tuple(
+                self.grid.positions[road])] * len(road.directions))
 
     def __add_cars(self) -> None:
         cars = ap.AgentList(self, self.n_cars, CarAgent)
-        self.grid.add_agents(cars, positions=[choice(self.spawn_points) for _ in range(self.n_cars)])
+        self.grid.add_agents(cars, positions=[choice(
+            self.spawn_points) for _ in range(self.n_cars)])
