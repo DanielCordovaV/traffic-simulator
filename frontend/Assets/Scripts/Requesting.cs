@@ -14,7 +14,6 @@ public class Requesting : MonoBehaviour
         // StartCoroutine(GetPositions( (i) => { objectQueue.Enqueue(i); } ));
         
         Data positions = JsonUtility.FromJson<Data>(jsonFile.text);
-        print(positions.cars);
         objectQueue.Enqueue(positions);
     }
 

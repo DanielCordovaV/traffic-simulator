@@ -90,6 +90,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7810156814739771490}
+  - component: {fileID: 8381686924499190661}
   m_Layer: 0
   m_Name: Wheels
   m_TagString: Untagged
@@ -112,6 +113,19 @@ Transform:
   m_Father: {fileID: 7810696241902174677}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8381686924499190661
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3585400482648176597}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1dfda1e1ebfd2c42a66194e03011545, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  wheels: {fileID: 7261903312695648786}
 --- !u!1 &4836123768345848162
 GameObject:
   m_ObjectHideFlags: 0
@@ -286,7 +300,7 @@ GameObject:
   - component: {fileID: 6502761362460521412}
   - component: {fileID: 6502761362460521415}
   m_Layer: 0
-  m_Name: Red_Car
+  m_Name: Car
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -387,6 +401,7 @@ GameObject:
   - component: {fileID: 7224538294325151606}
   - component: {fileID: 3963039190709397133}
   - component: {fileID: 686561418619392049}
+  - component: {fileID: 3861221189479276086}
   m_Layer: 0
   m_Name: Body
   m_TagString: Untagged
@@ -435,9 +450,9 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: b8ff3dbf2d1811b488591cfb25be7ad1, type: 2}
-  - {fileID: 2100000, guid: 8db262d26fcf2a94e88c9c276f6de722, type: 2}
-  - {fileID: 2100000, guid: 4a98cfae850de544680dc222604c30a4, type: 2}
+  - {fileID: 2100000, guid: af7cd578c246e8441a5143ad0549668e, type: 2}
+  - {fileID: 2100000, guid: 8176e1803b6a1d245a54b36a03ab011d, type: 2}
+  - {fileID: 2100000, guid: cd9bed79b7ead834d81904ef621f4459, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -459,6 +474,19 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &3861221189479276086
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7935568608827695951}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 859b1b067283f4e4f9eba2e5824f10ed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  renderer: {fileID: 686561418619392049}
 --- !u!1 &8589398119208326060
 GameObject:
   m_ObjectHideFlags: 0
