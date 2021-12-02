@@ -25,6 +25,7 @@ public class TrafficLight
     public int id;
     public List<int> pos;
     public string color;
+    public List<int> direction;
     public GameObject light;
 }
 

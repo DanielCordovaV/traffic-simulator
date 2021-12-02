@@ -49,7 +49,8 @@ public class GameManager : MonoBehaviour
                     if (objects.cars[i].id == cars[i].id)
                     {
                         cars[i].vehicle.GetComponent<NavMeshAgent>().Move(new Vector3(x, 0 ,z));
-                        CarRotation(objects.cars[i], cars[i].vehicle, objects.cars[i].direction[0], objects.cars[i].direction[0]);
+                        ObjectRotation(objects.cars[i].direction, cars[i].vehicle);
+                        cars[i].direction = objects.cars[i].direction;
                     }
                     
                     Debug.Log("Moved car");
@@ -61,6 +62,7 @@ public class GameManager : MonoBehaviour
                     {
                         shader = trafficLights[i].light.GetComponentInChildren<AccessShaderProperties>();
                         shader.ChangeLight(objects.trafficLights[i].color);
+                        trafficLights[i].color = objects.trafficLights[i].color;
                     }
                     
                     Debug.Log("Changed Traffic Light Color");
@@ -81,7 +83,7 @@ public class GameManager : MonoBehaviour
                 newGO = Instantiate(carPrefab, new Vector3(x, 0.66f, z), Quaternion.identity);
                 newGO.transform.parent = GameObject.Find("Cars").transform;
                 newGO.GetComponentInChildren<AccessCarShader>().ChangeColor();
-                CarRotation(objects.cars[i], newGO, objects.cars[i].direction[0], objects.cars[i].direction[0]);
+                ObjectRotation(objects.cars[i].direction, newGO);
                 tmpCar = objects.cars[i];
                 tmpCar.vehicle = newGO;
                 cars.Add(tmpCar);
@@ -94,6 +96,7 @@ public class GameManager : MonoBehaviour
                 shader = newGO.GetComponentInChildren<AccessShaderProperties>();
                 shader.ChangeLight(objects.trafficLights[i].color);
                 newGO.transform.parent = GameObject.Find("TrafficLights").transform;
+                // ObjectRotation(objects.trafficLights[i].direction, newGO);
                 tmpTrafficLight = objects.trafficLights[i];
                 tmpTrafficLight.light = newGO;
                 trafficLights.Add(tmpTrafficLight);
@@ -119,23 +122,23 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    void CarRotation(Car tmp, GameObject carCurr, float x, float z)
+    void ObjectRotation(List<int> tmp, GameObject curr)
     {
-        if (tmp.direction[0] == 1 && tmp.direction[1] == 0)
+        if (tmp[0] == 1 && tmp[1] == 0)
         {
-            carCurr.transform.Rotate(new Vector3 (0, 90, 0));
+            curr.transform.Rotate(new Vector3 (0, 90, 0));
         }
-        else if (tmp.direction[0] == -1 && tmp.direction[1] == 0)
+        else if (tmp[0] == -1 && tmp[1] == 0)
         {
-            carCurr.transform.Rotate(new Vector3 (0, -90, 0));
+            curr.transform.Rotate(new Vector3 (0, -90, 0));
         }
-        else if (tmp.direction[0] == 0 && tmp.direction[1] == 1)
+        else if (tmp[0] == 0 && tmp[1] == 1)
         {
-            carCurr.transform.Rotate(new Vector3 (0, 0, 0));
+            curr.transform.Rotate(new Vector3 (0, 0, 0));
         }
-        else if (tmp.direction[0] == 0 && tmp.direction[1] == -1)
+        else if (tmp[0] == 0 && tmp[1] == -1)
         {
-            carCurr.transform.Rotate(new Vector3 (0, 180, 0));
+            curr.transform.Rotate(new Vector3 (0, 180, 0));
         }
     }
 }
