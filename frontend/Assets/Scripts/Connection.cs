@@ -9,11 +9,12 @@ using NativeWebSocket;
 public class Connection : MonoBehaviour
 {
     WebSocket websocket;
-
+    private Data positions;
+    
     public async void Start()
     {
-        websocket = new WebSocket("ws://localhost:2567");
-
+        websocket = new WebSocket("ws://localhost:6789");
+        Debug.Log(websocket);
         websocket.OnOpen += () =>
         {
             Debug.Log("Connection open!");
@@ -31,11 +32,8 @@ public class Connection : MonoBehaviour
 
         websocket.OnMessage += (bytes) =>
         {
-            Debug.Log("OnMessage!");
-            Debug.Log(bytes);
-
             var message = System.Text.Encoding.UTF8.GetString(bytes);
-            Data positions = JsonUtility.FromJson<Data>(message);
+            positions = JsonUtility.FromJson<Data>(message);
             Singleton.Instance.objectQueue.Enqueue(positions);
         };
 
@@ -57,11 +55,9 @@ public class Connection : MonoBehaviour
     {
         if (websocket.State == WebSocketState.Open)
         {
-            // Sending bytes
-            await websocket.Send(new byte[] { 10, 20, 30 });
-
             // Sending plain text
-            await websocket.SendText("plain text message");
+            string tmp = "{\"action\": \"get_frame\"}";
+            await websocket.SendText(tmp);
         }
     }
 

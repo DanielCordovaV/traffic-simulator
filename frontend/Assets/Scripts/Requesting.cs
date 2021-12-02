@@ -16,9 +16,8 @@ public class Requesting : MonoBehaviour
         
         // socket.Start();
         
-        /*
         Data positions = JsonUtility.FromJson<Data>(jsonFile.text);
-        objectQueue.Enqueue(positions);*/
+        Singleton.Instance.objectQueue.Enqueue(positions);
     }
 
     IEnumerator GetPositions(System.Action<Data> callback)

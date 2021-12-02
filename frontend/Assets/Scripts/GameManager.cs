@@ -8,6 +8,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject carPrefab;
     [SerializeField] private GameObject streetPrefab;
     [SerializeField] private GameObject trafficLightPrefab;
+    [SerializeField] private float timeLimit;
+    [SerializeField] private GameObject canvas;
+    
     private NavMeshSurface mesh;
     
     private Requesting requestingScript;
@@ -21,50 +24,99 @@ public class GameManager : MonoBehaviour
     private List<Car> cars = new List<Car>();
     private List<Street> streets = new List<Street>();
     private List<TrafficLight> trafficLights = new List<TrafficLight>();
-    
-    [SerializeField] private int scaleMultiplier = 30;
+
+    private HashSet<int> currentCars = new HashSet<int>();
+
+    private float scaleMultiplier = 15f;
     private bool initialized = false;
+    private int numDistance = 0;
 
     void Start()
     {
         Debug.Log("Game Manager Start");
         /*requestingScript = requestManager.GetComponent<Requesting>();
-        requestingScript.Initialize();*/
+        requestingScript.Initialize();*/ 
         socket.Start();
     }
 
     void Update()
     {
+        if (timeLimit > 0f)
+        {
+            timeLimit -= Time.deltaTime;
+        }
+
         if (!initialized)
         {
             Initialize();
         }
-        else if (Singleton.Instance.objectQueue.TryDequeue(out objects))
+        
+        if (timeLimit <= 0f)
         {
+            canvas.SetActive(true);
+            Time.timeScale = 0;
+            Application.Quit();
+        }
+        
+        numDistance = 0;
+        for (int i = 0; i < cars.Count; i++)
+        {
+            if (cars[i].vehicle.GetComponent<NavMeshAgent>().remainingDistance < 5f)
+            {
+                numDistance++;
+            }
+        }
+
+        if (numDistance == cars.Count && Singleton.Instance.objectQueue.TryDequeue(out objects))
+        {
+            numDistance = 0;
+            currentCars = new HashSet<int>();
+            for (int i = 0; i < objects.cars.Count; i++)
+            {
+                currentCars.Add(objects.cars[i].id);
+            }
+            
+            List<Car> toRemove = new List<Car>();
+            for (int i = 0; i < cars.Count; i++)
+            {
+                if (!currentCars.Contains(cars[i].id))
+                {
+                    toRemove.Add(cars[i]);
+                }
+            }
+
+            foreach (var trash in toRemove)
+            {
+                Destroy(trash.vehicle);
+                cars.Remove(trash);
+            }
+            
             for (int i = 0; i < objects.cars.Count; i++) 
             {
-                    float x = objects.cars[i].pos[0] * scaleMultiplier;
-                    float z = objects.cars[i].pos[1] * scaleMultiplier;
-                    if (objects.cars[i].id == cars[i].id)
-                    {
-                        cars[i].vehicle.GetComponent<NavMeshAgent>().Move(new Vector3(x, 0 ,z));
-                        ObjectRotation(objects.cars[i].direction, cars[i].vehicle);
-                        cars[i].direction = objects.cars[i].direction;
-                    }
-                    
-                    Debug.Log("Moved car");
+                float xNew = objects.cars[i].pos[0] * scaleMultiplier;
+                float zNew = objects.cars[i].pos[1] * scaleMultiplier;
+                float xOld = cars[i].pos[0] * scaleMultiplier;
+                float zOld = cars[i].pos[1] * scaleMultiplier;
+
+                if (objects.cars[i].id == cars[i].id)
+                {
+                    Vector3 result = new Vector3(xNew, 0, zNew) - new Vector3(xOld, 0, zOld);
+                    cars[i].vehicle.GetComponent<NavMeshAgent>().destination = new Vector3(xNew, 0, zNew);
+                    cars[i].pos = objects.cars[i].pos;
+                    cars[i].direction = objects.cars[i].direction;
+                }
             }
-    
+
             for (int i = 0; i < objects.trafficLights.Count; i++)
             {
                 if (objects.trafficLights[i].id == trafficLights[i].id)
                 {
+                    // Debug.Log(objects.trafficLights[i].color);
+                    Debug.Log(objects.trafficLights[i].color + " " + objects.trafficLights[i].id);
                     shader = trafficLights[i].light.GetComponentInChildren<AccessShaderProperties>();
                     shader.ChangeLight(objects.trafficLights[i].color);
                     trafficLights[i].color = objects.trafficLights[i].color;
                 }
-                
-                Debug.Log("Changed Traffic Light Color");
             }
         }
     }
@@ -75,8 +127,8 @@ public class GameManager : MonoBehaviour
         if (Singleton.Instance.objectQueue.TryDequeue(out objects))
         {
             GameObject newGO;
-            
             // Adds the cars
+            
             for (int i = 0; i < objects.cars.Count; i++)
             {
                 float x = objects.cars[i].pos[0] * scaleMultiplier;
@@ -87,6 +139,7 @@ public class GameManager : MonoBehaviour
                 ObjectRotation(objects.cars[i].direction, newGO);
                 tmpCar = objects.cars[i];
                 tmpCar.vehicle = newGO;
+                currentCars.Add(tmpCar.id);
                 cars.Add(tmpCar);
             }
             
@@ -99,13 +152,25 @@ public class GameManager : MonoBehaviour
                 shader = newGO.GetComponentInChildren<AccessShaderProperties>();
                 shader.ChangeLight(objects.trafficLights[i].color);
                 newGO.transform.parent = GameObject.Find("TrafficLights").transform;
-                // ObjectRotation(objects.trafficLights[i].direction, newGO);
+                ObjectRotation(objects.trafficLights[i].direction, newGO);
+                newGO.transform.Rotate(new Vector3(0,180,0));
+                Debug.Log(objects.trafficLights[i].direction);
+                
+                if (objects.trafficLights[i].direction[0] == 0 && objects.trafficLights[i].direction[1] == 1)
+                {
+                    newGO.transform.position = new Vector3(64.28f,0,57.5f);
+                }
+                else if (objects.trafficLights[i].direction[0] == 1 && objects.trafficLights[i].direction[1] == 0)
+                {
+                    newGO.transform.position = new Vector3(53.9f,0,57.8f);
+                }
+                
                 tmpTrafficLight = objects.trafficLights[i];
                 tmpTrafficLight.light = newGO;
                 trafficLights.Add(tmpTrafficLight);
             }
             
-            // Adds the streets
+            /*// Adds the streets
             for (int i = 0; i < objects.streets.Count; i++)
             {
                 float x = objects.trafficLights[i].pos[0] * scaleMultiplier;
@@ -123,7 +188,8 @@ public class GameManager : MonoBehaviour
             {
                 mesh = streets[0].street.GetComponent<NavMeshSurface>();
                 mesh.BuildNavMesh();
-            }
+            }*/
+            
             initialized = true;
         }
     }
