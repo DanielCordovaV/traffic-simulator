@@ -21,7 +21,7 @@ public class Requesting : MonoBehaviour
         objectQueue.Enqueue(positions);*/
     }
 
-    IEnumerator GetPositions(System.Action<Root> callback)
+    IEnumerator GetPositions(System.Action<Data> callback)
     {
         while (true)
         {
@@ -29,7 +29,7 @@ public class Requesting : MonoBehaviour
             UnityWebRequest www = UnityWebRequest.Get("https://traffic-simulator.us-south.cf.appdomain.cloud/");
             yield return www.SendWebRequest();
 
-            Root positions = JsonUtility.FromJson<Root>(www.downloadHandler.text);
+            Data positions = JsonUtility.FromJson<Data>(www.downloadHandler.text);
             callback(positions);
             yield return new WaitForSeconds(requestDelay);
         }

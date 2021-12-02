@@ -69,12 +69,14 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // Places the cars, traffic lights and streets in their positions 
+    // Places the cars, traffic lights and streets in their initial positions
     void Initialize()
     {
         if (Singleton.Instance.objectQueue.TryDequeue(out objects))
         {
             GameObject newGO;
+            
+            // Adds the cars
             for (int i = 0; i < objects.cars.Count; i++)
             {
                 float x = objects.cars[i].pos[0] * scaleMultiplier;
@@ -87,6 +89,8 @@ public class GameManager : MonoBehaviour
                 tmpCar.vehicle = newGO;
                 cars.Add(tmpCar);
             }
+            
+            // Adds the traffic lights
             for (int i = 0; i < objects.trafficLights.Count; i++)
             {
                 float x = objects.trafficLights[i].pos[0] * scaleMultiplier;
@@ -100,6 +104,8 @@ public class GameManager : MonoBehaviour
                 tmpTrafficLight.light = newGO;
                 trafficLights.Add(tmpTrafficLight);
             }
+            
+            // Adds the streets
             for (int i = 0; i < objects.streets.Count; i++)
             {
                 float x = objects.trafficLights[i].pos[0] * scaleMultiplier;
@@ -111,7 +117,8 @@ public class GameManager : MonoBehaviour
                 streets.Add(tmpStreet);
                 Debug.Log("Added street");
             }
-
+            
+            // Creates the nav mesh if the streets have been added
             if (streets.Count > 0)
             {
                 mesh = streets[0].street.GetComponent<NavMeshSurface>();
@@ -121,6 +128,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // Rotates objects
     void ObjectRotation(List<int> tmp, GameObject curr)
     {
         if (tmp[0] == 1 && tmp[1] == 0)

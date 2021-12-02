@@ -5,6 +5,7 @@ public class AccessCarShader : MonoBehaviour
     [SerializeField] private MeshRenderer renderer;
     private Color carColor;
 
+    // Function that is used to change the color of cars when they are instantiated
     public void ChangeColor()
     { 
         carColor = new Color(

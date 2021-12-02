@@ -10,7 +10,6 @@ public class Connection : MonoBehaviour
 {
     WebSocket websocket;
 
-    // Start is called before the first frame update
     public async void Start()
     {
         websocket = new WebSocket("ws://localhost:2567");
@@ -35,11 +34,9 @@ public class Connection : MonoBehaviour
             Debug.Log("OnMessage!");
             Debug.Log(bytes);
 
-            // getting the message as a string
             var message = System.Text.Encoding.UTF8.GetString(bytes);
             Data positions = JsonUtility.FromJson<Data>(message);
             Singleton.Instance.objectQueue.Enqueue(positions);
-            // Debug.Log("OnMessage! " + message);
         };
 
         // Keep sending messages at every 0.3s

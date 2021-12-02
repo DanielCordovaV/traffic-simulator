@@ -4,6 +4,7 @@ public class AccessShaderProperties : MonoBehaviour
 {
     [SerializeField] private MeshRenderer renderer;
 
+    // Changes the color of a traffic light based on the input from the backend
     public void ChangeLight(string curr)
     {
         if (curr == "green_light")
@@ -20,6 +21,7 @@ public class AccessShaderProperties : MonoBehaviour
         }
     }
     
+    // Turn the traffic light yellow
     public void TurnYellow()
     {
         renderer.materials[0].SetColor("Color_6c804fa6c9684660857e2ea21b6d18f9",Color.yellow);
@@ -27,6 +29,7 @@ public class AccessShaderProperties : MonoBehaviour
         renderer.materials[2].SetColor("Color_009dd960dc6646a6bea6e0e1b2c9c4bb",Color.black);
     }
     
+    // Turn the traffic light green
     public void TurnGreen()
     {
         renderer.materials[0].SetColor("Color_6c804fa6c9684660857e2ea21b6d18f9",Color.black);
@@ -34,6 +37,7 @@ public class AccessShaderProperties : MonoBehaviour
         renderer.materials[2].SetColor("Color_009dd960dc6646a6bea6e0e1b2c9c4bb",Color.green);
     }
     
+    // Turn the traffic light red
     public void TurnRed()
     {
         renderer.materials[0].SetColor("Color_6c804fa6c9684660857e2ea21b6d18f9",Color.black);
