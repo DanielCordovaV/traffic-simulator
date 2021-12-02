@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject trafficLightPrefab;
     [SerializeField] private float timeLimit;
     [SerializeField] private GameObject canvas;
+    [SerializeField] private GameObject floor;
     
     private NavMeshSurface mesh;
     
@@ -19,7 +20,6 @@ public class GameManager : MonoBehaviour
     private Car tmpCar;
     private TrafficLight tmpTrafficLight;
     private Street tmpStreet;
-    private Connection socket;
 
     private List<Car> cars = new List<Car>();
     private List<Street> streets = new List<Street>();
@@ -34,9 +34,9 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         Debug.Log("Game Manager Start");
-        /*requestingScript = requestManager.GetComponent<Requesting>();
-        requestingScript.Initialize();*/ 
-        socket.Start();
+        requestingScript = requestManager.GetComponent<Requesting>();
+        requestingScript.Initialize();
+        // socket.Start();
     }
 
     void Update()
@@ -61,7 +61,7 @@ public class GameManager : MonoBehaviour
         numDistance = 0;
         for (int i = 0; i < cars.Count; i++)
         {
-            if (cars[i].vehicle.GetComponent<NavMeshAgent>().remainingDistance < 5f)
+            if (cars[i].vehicle.GetComponent<NavMeshAgent>().remainingDistance < 11f)
             {
                 numDistance++;
             }
@@ -93,15 +93,13 @@ public class GameManager : MonoBehaviour
             
             for (int i = 0; i < objects.cars.Count; i++) 
             {
-                float xNew = objects.cars[i].pos[0] * scaleMultiplier;
-                float zNew = objects.cars[i].pos[1] * scaleMultiplier;
-                float xOld = cars[i].pos[0] * scaleMultiplier;
-                float zOld = cars[i].pos[1] * scaleMultiplier;
+                float zNew = objects.cars[i].pos[0] * scaleMultiplier;
+                float xNew = objects.cars[i].pos[1] * scaleMultiplier;
 
                 if (objects.cars[i].id == cars[i].id)
                 {
-                    Vector3 result = new Vector3(xNew, 0, zNew) - new Vector3(xOld, 0, zOld);
                     cars[i].vehicle.GetComponent<NavMeshAgent>().destination = new Vector3(xNew, 0, zNew);
+                    // Debug.Log("destination: " + cars[i].vehicle.GetComponent<NavMeshAgent>().destination);
                     cars[i].pos = objects.cars[i].pos;
                     cars[i].direction = objects.cars[i].direction;
                 }
@@ -112,12 +110,18 @@ public class GameManager : MonoBehaviour
                 if (objects.trafficLights[i].id == trafficLights[i].id)
                 {
                     // Debug.Log(objects.trafficLights[i].color);
-                    Debug.Log(objects.trafficLights[i].color + " " + objects.trafficLights[i].id);
+                    // Debug.Log(objects.trafficLights[i].color + " " + objects.trafficLights[i].id);
                     shader = trafficLights[i].light.GetComponentInChildren<AccessShaderProperties>();
                     shader.ChangeLight(objects.trafficLights[i].color);
                     trafficLights[i].color = objects.trafficLights[i].color;
                 }
             }
+        }
+        if (timeLimit <= 0f)
+        {
+            canvas.SetActive(true);
+            Time.timeScale = 0;
+            Application.Quit();
         }
     }
 
@@ -127,12 +131,59 @@ public class GameManager : MonoBehaviour
         if (Singleton.Instance.objectQueue.TryDequeue(out objects))
         {
             GameObject newGO;
-            // Adds the cars
             
+            // Adds the streets
+            for (int i = 0; i < objects.streets.Count; i++)
+            {
+                float zStart = objects.streets[i].start[0];
+                float xStart = objects.streets[i].start[1];
+                float zEnd = objects.streets[i].end[0];
+                float xEnd = objects.streets[i].end[1];
+                
+                Vector3 mid = (new Vector3(xStart, 0f, zStart) + new Vector3(xEnd, 0f, zEnd)) / 2;
+                
+                if (objects.streets[i].direction[0] == 0 && objects.streets[i].direction[1] == 1)
+                {
+                    mid += new Vector3(0,0.001f,0);
+                }
+                else if (objects.streets[i].direction[0] == 1 && objects.streets[i].direction[1] == 0)
+                {
+                    mid += new Vector3(0,0.002f,0);
+                }
+                else if (objects.streets[i].direction[0] == -1 && objects.streets[i].direction[1] == 0)
+                {
+                    mid += new Vector3(0,-0.002f,0);
+                }
+                else if (objects.streets[i].direction[0] == 0 && objects.streets[i].direction[1] == -1)
+                {
+                    mid += new Vector3(0,-0.001f,0);
+                }
+                
+                
+                newGO = Instantiate(streetPrefab, mid * scaleMultiplier, Quaternion.identity);
+                ObjectRotation(objects.streets[i].direction, newGO);
+                newGO.transform.Rotate(0,90,0);
+                newGO.transform.parent = GameObject.Find("Road").transform;
+                tmpStreet = objects.streets[i];
+                tmpStreet.street = newGO;
+                streets.Add(tmpStreet);
+                Debug.Log("Added street");
+            }
+            
+            // Creates the nav mesh if the streets have been added
+            if (streets.Count > 0)
+            {
+                Debug.Log("bake");
+                mesh = streets[0].street.GetComponent<NavMeshSurface>();
+                mesh.BuildNavMesh();
+                floor.SetActive(true);
+            }
+            
+            // Adds the cars
             for (int i = 0; i < objects.cars.Count; i++)
             {
-                float x = objects.cars[i].pos[0] * scaleMultiplier;
-                float z = objects.cars[i].pos[1] * scaleMultiplier;
+                float z = objects.cars[i].pos[0] * scaleMultiplier;
+                float x = objects.cars[i].pos[1] * scaleMultiplier;
                 newGO = Instantiate(carPrefab, new Vector3(x, 0.66f, z), Quaternion.identity);
                 newGO.transform.parent = GameObject.Find("Cars").transform;
                 newGO.GetComponentInChildren<AccessCarShader>().ChangeColor();
@@ -146,50 +197,37 @@ public class GameManager : MonoBehaviour
             // Adds the traffic lights
             for (int i = 0; i < objects.trafficLights.Count; i++)
             {
-                float x = objects.trafficLights[i].pos[0] * scaleMultiplier;
-                float z = objects.trafficLights[i].pos[1] * scaleMultiplier;
+                float z = objects.trafficLights[i].pos[0] * scaleMultiplier;
+                float x = objects.trafficLights[i].pos[1] * scaleMultiplier;
                 newGO = Instantiate(trafficLightPrefab, new Vector3(x, 0, z), Quaternion.identity);
                 shader = newGO.GetComponentInChildren<AccessShaderProperties>();
                 shader.ChangeLight(objects.trafficLights[i].color);
                 newGO.transform.parent = GameObject.Find("TrafficLights").transform;
                 ObjectRotation(objects.trafficLights[i].direction, newGO);
                 newGO.transform.Rotate(new Vector3(0,180,0));
-                Debug.Log(objects.trafficLights[i].direction);
                 
                 if (objects.trafficLights[i].direction[0] == 0 && objects.trafficLights[i].direction[1] == 1)
                 {
-                    newGO.transform.position = new Vector3(64.28f,0,57.5f);
+                    newGO.transform.position = new Vector3(x - 8f,0f,z - 8f);
                 }
                 else if (objects.trafficLights[i].direction[0] == 1 && objects.trafficLights[i].direction[1] == 0)
                 {
-                    newGO.transform.position = new Vector3(53.9f,0,57.8f);
+                    newGO.transform.position = new Vector3(x + 8f,0f,z - 8f);
+                }
+                else if (objects.trafficLights[i].direction[0] == -1 && objects.trafficLights[i].direction[1] == 0)
+                {
+                    newGO.transform.position = new Vector3(x - 8f,0f,z + 8f);
+                }
+                else if (objects.trafficLights[i].direction[0] == 0 && objects.trafficLights[i].direction[1] == -1)
+                {
+                    newGO.transform.position = new Vector3(x + 8f,0f,z + 8f);
                 }
                 
                 tmpTrafficLight = objects.trafficLights[i];
                 tmpTrafficLight.light = newGO;
                 trafficLights.Add(tmpTrafficLight);
             }
-            
-            /*// Adds the streets
-            for (int i = 0; i < objects.streets.Count; i++)
-            {
-                float x = objects.trafficLights[i].pos[0] * scaleMultiplier;
-                float z = objects.trafficLights[i].pos[1] * scaleMultiplier;
-                newGO = Instantiate(streetPrefab, new Vector3(x, 0, z), Quaternion.identity);
-                newGO.transform.parent = GameObject.Find("Road").transform;
-                tmpStreet = objects.streets[i];
-                tmpStreet.street = newGO;
-                streets.Add(tmpStreet);
-                Debug.Log("Added street");
-            }
-            
-            // Creates the nav mesh if the streets have been added
-            if (streets.Count > 0)
-            {
-                mesh = streets[0].street.GetComponent<NavMeshSurface>();
-                mesh.BuildNavMesh();
-            }*/
-            
+
             initialized = true;
         }
     }
@@ -199,19 +237,19 @@ public class GameManager : MonoBehaviour
     {
         if (tmp[0] == 1 && tmp[1] == 0)
         {
-            curr.transform.Rotate(new Vector3 (0, 90, 0));
+            curr.transform.Rotate(new Vector3 (0, 0, 0));
         }
         else if (tmp[0] == -1 && tmp[1] == 0)
         {
-            curr.transform.Rotate(new Vector3 (0, -90, 0));
+            curr.transform.Rotate(new Vector3 (0, 180, 0));
         }
         else if (tmp[0] == 0 && tmp[1] == 1)
         {
-            curr.transform.Rotate(new Vector3 (0, 0, 0));
+            curr.transform.Rotate(new Vector3 (0, 90, 0));
         }
         else if (tmp[0] == 0 && tmp[1] == -1)
         {
-            curr.transform.Rotate(new Vector3 (0, 180, 0));
+            curr.transform.Rotate(new Vector3 (0, -90, 0));
         }
     }
 }

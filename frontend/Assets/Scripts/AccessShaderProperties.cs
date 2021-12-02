@@ -19,7 +19,7 @@ public class AccessShaderProperties : MonoBehaviour
         {
             TurnYellow();
         }
-        Debug.Log("Changed light to: " + curr);
+        // Debug.Log("Changed light to: " + curr);
     }
     
     // Turn the traffic light yellow

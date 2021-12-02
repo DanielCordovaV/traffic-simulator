@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using UnityEngine;
@@ -5,32 +6,38 @@ using UnityEngine.Networking;
 
 public class Requesting : MonoBehaviour
 {
-    [SerializeField] private float requestDelay = 500.0f;
+    [SerializeField] private float requestDelay = 0.1f;
 
-    // public ConcurrentQueue<Data> objectQueue = new ConcurrentQueue<Data>();
     public TextAsset jsonFile;
-    // private Connection socket;
+    String url = "https://traffic-simulator-grouchy-bear-tt.mybluemix.net/" + DateTimeOffset.Now.ToUnixTimeSeconds();
     public void Initialize()
     {
-        // StartCoroutine(GetPositions( (i) => { objectQueue.Enqueue(i); } ));
+        StartCoroutine(GetPositions());
         
-        // socket.Start();
-        
+        /*
         Data positions = JsonUtility.FromJson<Data>(jsonFile.text);
-        Singleton.Instance.objectQueue.Enqueue(positions);
+        Singleton.Instance.objectQueue.Enqueue(positions);*/
     }
-
-    IEnumerator GetPositions(System.Action<Data> callback)
+    
+    /*(i) => { objectQueue.Enqueue(i); }
+     System.Action<Data> callback
+     */ 
+    
+    IEnumerator GetPositions()
     {
         while (true)
         {
             // yield return new WaitForSeconds(requestDelay);
-            UnityWebRequest www = UnityWebRequest.Get("https://traffic-simulator.us-south.cf.appdomain.cloud/");
+            Debug.Log(url);
+            UnityWebRequest www = UnityWebRequest.Get(url);
             yield return www.SendWebRequest();
 
             Data positions = JsonUtility.FromJson<Data>(www.downloadHandler.text);
-            callback(positions);
-            yield return new WaitForSeconds(requestDelay);
+            Singleton.Instance.objectQueue.Enqueue(positions);
+            Debug.Log(url);
+            // callback(positions);
+            // yield return new WaitForSeconds(0.1f);
+            yield return null;
         }
     }
 }

@@ -33,7 +33,8 @@ public class TrafficLight
 public class Street
 {
     public int id;
-    public List<int> pos;
+    public List<int> start;
+    public List<int> end;
     public List<int> direction;
     public GameObject street;
 }
