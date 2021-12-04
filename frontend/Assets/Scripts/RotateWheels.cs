@@ -5,7 +5,8 @@ public class RotateWheels : MonoBehaviour
     public GameObject wheels;
     private int amountChilds = 4;
     [SerializeField] private int spinSpeed = 5;
-
+    
+    // Function that is used rotate the wheels of a car
     void SpinWheels()
     {
         amountChilds = wheels.transform.childCount;

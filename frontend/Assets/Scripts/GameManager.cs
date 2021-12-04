@@ -36,7 +36,6 @@ public class GameManager : MonoBehaviour
         Debug.Log("Game Manager Start");
         requestingScript = requestManager.GetComponent<Requesting>();
         requestingScript.Initialize();
-        // socket.Start();
     }
 
     void Update()
@@ -99,7 +98,6 @@ public class GameManager : MonoBehaviour
                 if (objects.cars[i].id == cars[i].id)
                 {
                     cars[i].vehicle.GetComponent<NavMeshAgent>().destination = new Vector3(xNew, 0, zNew);
-                    // Debug.Log("destination: " + cars[i].vehicle.GetComponent<NavMeshAgent>().destination);
                     cars[i].pos = objects.cars[i].pos;
                     cars[i].direction = objects.cars[i].direction;
                 }
@@ -109,8 +107,6 @@ public class GameManager : MonoBehaviour
             {
                 if (objects.trafficLights[i].id == trafficLights[i].id)
                 {
-                    // Debug.Log(objects.trafficLights[i].color);
-                    // Debug.Log(objects.trafficLights[i].color + " " + objects.trafficLights[i].id);
                     shader = trafficLights[i].light.GetComponentInChildren<AccessShaderProperties>();
                     shader.ChangeLight(objects.trafficLights[i].color);
                     trafficLights[i].color = objects.trafficLights[i].color;
@@ -173,7 +169,6 @@ public class GameManager : MonoBehaviour
             // Creates the nav mesh if the streets have been added
             if (streets.Count > 0)
             {
-                Debug.Log("bake");
                 mesh = streets[0].street.GetComponent<NavMeshSurface>();
                 mesh.BuildNavMesh();
                 floor.SetActive(true);
@@ -192,6 +187,7 @@ public class GameManager : MonoBehaviour
                 tmpCar.vehicle = newGO;
                 currentCars.Add(tmpCar.id);
                 cars.Add(tmpCar);
+                Debug.Log("Added car");
             }
             
             // Adds the traffic lights
@@ -226,6 +222,7 @@ public class GameManager : MonoBehaviour
                 tmpTrafficLight = objects.trafficLights[i];
                 tmpTrafficLight.light = newGO;
                 trafficLights.Add(tmpTrafficLight);
+                Debug.Log("Added Traffic Light");
             }
 
             initialized = true;
